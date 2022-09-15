@@ -81,15 +81,27 @@ func main() {
 	}
 
 	stop := false
-	//for len(matchingResults) < 3 {
+	actualMinSizeFound := 0
+
 	for !stop {
+
+		for i, v := range matchingWords {
+			if len(v) < 1 {
+				stop = true
+			}
+			if len(i) < actualMinSizeFound {
+				delete(matchingWords, i)
+			}
+		}
+		minSizeFound := 0
+
 		for i, v := range allPossibleWordsMatching {
 			morseSizeForCurrentWord := len(v)
 
 			for x, y := range matchingWords {
 				if morseSizeForCurrentWord <= len(y) {
 					if v == y[:morseSizeForCurrentWord] {
-						//fmt.Println(x + "-" + i)
+
 						if len(y[morseSizeForCurrentWord:]) < 1 {
 							finalSentence := x + "-" + i
 							cadenaSlice := strings.Split(finalSentence, "-")
@@ -100,30 +112,36 @@ func main() {
 							}
 
 							matchingResults[finalSentence] = resultadoMorse
-							// fmt.Println("@@@@@@@@@@@@@@@@@@@@@")
-							// fmt.Println(cadenaSlice)
-							// fmt.Println(resultadoMorse)
-							// fmt.Println("@@@@@@@@@@@@@@@@@@@@@")
 
 							//log.Fatal("FOUND:", finalSentence+" //// ", resultadoMorse)
 							matchingWords[x+"-"+i] = y[morseSizeForCurrentWord:]
 
-							stop = true
 						}
 
+						matchSizeFound := len(i)
+
+						if minSizeFound == 0 {
+							minSizeFound = matchSizeFound
+						} else {
+							if minSizeFound < matchSizeFound {
+								minSizeFound = matchSizeFound
+							}
+						}
 						matchingWords[x+"-"+i] = y[morseSizeForCurrentWord:]
 					}
 				}
 
 			}
 		}
+
+		actualMinSizeFound += minSizeFound
 	}
 
 	fmt.Printf("Resultados encontrados: \n")
 	fmt.Printf("%s\n", strings.Repeat("-", 30))
-	for i, _ := range matchingResults {
-		fmt.Printf("%s\n", i)
+	for i := range matchingResults {
+		fmt.Printf("%s\n", strings.ReplaceAll(i, "-", " "))
 	}
-	fmt.Println(matchingWords)
+	//fmt.Println(matchingWords)
 
 }
