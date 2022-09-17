@@ -46,22 +46,24 @@ func main() {
 			morse += morseMap[string(v)]
 		}
 
-		dictionaryMorseMap[morse] = word
+		dictionaryMorseMap[word] = morse
 	}
 
 	allPossibleWordsMatching := map[string]string{}
 
 	y := maxWordLen + 1
 
-	//fmt.Println("palabra mas larga: ", maxWordLen)
-
 	for i := y; i > 1; i-- {
 		yAux := i
 
 		for x := 0; x <= len(morseStringToDecode)-i; x++ {
+
 			match := morseStringToDecode[x:yAux]
-			if len(dictionaryMorseMap[match]) > 0 {
-				allPossibleWordsMatching[dictionaryMorseMap[match]] = match
+
+			for word, morseEq := range dictionaryMorseMap {
+				if morseEq == match {
+					allPossibleWordsMatching[word] = match
+				}
 			}
 
 			yAux++
@@ -80,20 +82,8 @@ func main() {
 		}
 	}
 
-	stop := false
-	actualMinSizeFound := 0
-
-	for !stop {
-
-		for i, v := range matchingWords {
-			if len(v) < 1 {
-				stop = true
-			}
-			if len(i) < actualMinSizeFound {
-				delete(matchingWords, i)
-			}
-		}
-		minSizeFound := 0
+	for i := 0; i < len(allPossibleWordsMatching); i++ {
+		//fmt.Println(matchingWords)
 
 		for i, v := range allPossibleWordsMatching {
 			morseSizeForCurrentWord := len(v)
@@ -113,28 +103,16 @@ func main() {
 
 							matchingResults[finalSentence] = resultadoMorse
 
-							//log.Fatal("FOUND:", finalSentence+" //// ", resultadoMorse)
 							matchingWords[x+"-"+i] = y[morseSizeForCurrentWord:]
 
 						}
 
-						matchSizeFound := len(i)
-
-						if minSizeFound == 0 {
-							minSizeFound = matchSizeFound
-						} else {
-							if minSizeFound < matchSizeFound {
-								minSizeFound = matchSizeFound
-							}
-						}
 						matchingWords[x+"-"+i] = y[morseSizeForCurrentWord:]
 					}
 				}
 
 			}
 		}
-
-		actualMinSizeFound += minSizeFound
 	}
 
 	fmt.Printf("Resultados encontrados: \n")
